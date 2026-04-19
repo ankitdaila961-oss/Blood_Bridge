@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Nearby Blood Camps - Blood Bridge</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Mapbox CSS -->
+  <link href='https://api.mapbox.com/mapbox-gl-js/v3.1.0/mapbox-gl.css' rel='stylesheet' />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff5f5;
+    }
+
+    .header {
+      background: white;
+      padding: 15px 30px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header h1 {
+      color: #c0392b;
+      font-size: 22px;
+    }
+
+    .container {
+      display: flex;
+      height: calc(100vh - 60px);
+    }
+
+    /* MAP */
+    #map {
+      width: 60%;
+      height: 100%;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 40%;
+      overflow-y: auto;
+      padding: 20px;
+      background: white;
+    }
+
+    .sidebar h2 {
+      color: #c0392b;
+      margin-bottom: 15px;
+      font-size: 18px;
+    }
+
+    .camp-card {
+      background: #fff;
+      border: 1px solid #f0c0c0;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 15px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .camp-card:hover {
+      border-color: #c0392b;
+      box-shadow: 0 4px 15px rgba(192, 57, 43, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .camp-card h3 {
+      color: #c0392b;
+      font-size: 15px;
+      margin-bottom: 5px;
+    }
+
+    .camp-card p {
+      color: #666;
+      font-size: 13px;
+      margin: 3px 0;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+
+    .open {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .closed {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .unknown {
+      background: #e2e3e5;
+      color: #383d41;
+    }
+
+    .alert-btn {
+      width: 100%;
+      padding: 8px;
+      margin-top: 8px;
+      background: #c0392b;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .alert-btn:hover {
+      background: #a93226;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #c0392b;
+      font-size: 16px;
+    }
+
+    /* Alert Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 16px;
+      padding: 30px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .modal h2 {
+      color: #c0392b;
+      margin-bottom: 10px;
+    }
+
+    .modal p {
+      color: #666;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .modal input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    .modal-btn {
+      width: 100%;
+      padding: 12px;
+      background: #c0392b;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 8px;
+    }
+
+    .modal-close {
+      background: #eee;
+      color: #333;
+    }
+
+    .success-msg {
+      background: #d4edda;
+      color: #155724;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 10px;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    🩸 <h1>Blood Bridge — Nearby Blood Camps</h1>
+  </div>
+
+  <div class="container">
+    <div id="map"></div>
+
+    <div class="sidebar">
+      <h2>📍 Nearby Blood Camps</h2>
+      <div id="camp-list">
+        <div class="loading">📍 Location detect ho rahi hai...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alert Modal -->
+  <div class="modal-overlay" id="alertModal">
+    <div class="modal">
+      <h2>🚨 Blood Alert Bhejo</h2>
+      <p id="modal-camp-name" style="color:#c0392b; font-weight:bold;"></p>
+      <p>Is camp ko blood emergency alert bhejne ke liye apna naam aur blood group enter karo:</p>
+      <input type="text" id="alert-name" placeholder="Tumhara naam" />
+      <input type="text" id="alert-blood" placeholder="Blood group (e.g. AB-)" />
+      <input type="text" id="alert-phone" placeholder="Phone number" />
+      <button class="modal-btn" onclick="sendAlert()">🚨 Alert Bhejo</button>
+      <button class="modal-btn modal-close" onclick="closeModal()">Cancel</button>
+      <div class="success-msg" id="successMsg">✅ Alert record ho gaya! Camp ko notify kiya jayega.</div>
+    </div>
+  </div>
+
+  <!-- Mapbox JS -->
+  <script src='https://api.mapbox.com/mapbox-gl-js/v3.1.0/mapbox-gl.js'></script>
+
+  <script>
+    // ✅ APNI MAPBOX KEY YAHAN DAALO
+    mapboxgl.accessToken = 'AIzaSyBkJsqE1Z0uHhkHopKqDUtVSQkG9TXc8-yc';
+
+    let map;
+    let markers = [];
+    let selectedCamp = '';
+
+    // Map initialize
+    function initMap(lat, lng) {
+      map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v12',
+        center: [lng, lat],
+        zoom: 13
+      });
+
+      // User location marker
+      new mapboxgl.Marker({ color: '#c0392b' })
+        .setLngLat([lng, lat])
+        .setPopup(new mapboxgl.Popup().setHTML('<b>📍 Tumhari Location</b>'))
+        .addTo(map);
+
+      // Camps fetch karo
+      fetchCamps(lat, lng);
+    }
+
+    // Camps fetch
+    async function fetchCamps(lat, lng) {
+      try {
+        const res = await fetch(`/api/camps/nearby?lat=${lat}&lng=${lng}`);
+        const data = await res.json();
+
+        if (data.camps && data.camps.length > 0) {
+          showCamps(data.camps);
+        } else {
+          document.getElementById('camp-list').innerHTML =
+            '<p style="color:#666;text-align:center;padding:20px;">Koi camp nahi mila 5km mein</p>';
+        }
+      } catch (err) {
+        document.getElementById('camp-list').innerHTML =
+          '<p style="color:red;text-align:center;padding:20px;">Error! Server check karo.</p>';
+      }
+    }
+
+    // Camps dikhao
+    function showCamps(camps) {
+      const list = document.getElementById('camp-list');
+      list.innerHTML = '';
+
+      camps.forEach((camp, i) => {
+        // Map pe marker lagao
+        const marker = new mapboxgl.Marker({ color: '#e74c3c' })
+          .setLngLat([camp.lng, camp.lat])
+          .setPopup(
+            new mapboxgl.Popup().setHTML(`
+            <b>${camp.name}</b><br>
+            📍 ${camp.address}<br>
+            ⭐ ${camp.rating}
+          `)
+          )
+          .addTo(map);
+        markers.push(marker);
+
+        // Badge
+        let badgeClass = 'unknown';
+        let badgeText = 'Hours Unknown';
+        if (camp.open_now === true) { badgeClass = 'open'; badgeText = '✅ Abhi Open'; }
+        if (camp.open_now === false) { badgeClass = 'closed'; badgeText = '❌ Abhi Closed'; }
+
+        // Card banao
+        const card = document.createElement('div');
+        card.className = 'camp-card';
+        card.innerHTML = `
+        <h3>🏥 ${camp.name}</h3>
+        <p>📍 ${camp.address}</p>
+        <p>⭐ Rating: ${camp.rating}</p>
+        <span class="badge ${badgeClass}">${badgeText}</span>
+        <button class="alert-btn" onclick="openModal('${camp.name.replace(/'/g, '')}')">
+          🚨 Blood Alert Bhejo
+        </button>
+      `;
+
+        // Card click pe map focus
+        card.addEventListener('click', () => {
+          map.flyTo({ center: [camp.lng, camp.lat], zoom: 16 });
+          marker.togglePopup();
+        });
+
+        list.appendChild(card);
+      });
+    }
+
+    // Modal
+    function openModal(campName) {
+      selectedCamp = campName;
+      document.getElementById('modal-camp-name').textContent = '🏥 ' + campName;
+      document.getElementById('alertModal').classList.add('active');
+      document.getElementById('successMsg').style.display = 'none';
+    }
+
+    function closeModal() {
+      document.getElementById('alertModal').classList.remove('active');
+    }
+
+    function sendAlert() {
+      const name = document.getElementById('alert-name').value;
+      const blood = document.getElementById('alert-blood').value;
+      const phone = document.getElementById('alert-phone').value;
+
+      if (!name || !blood || !phone) {
+        alert('Sabhi fields bharo!');
+        return;
+      }
+
+      // ✅ Ye alert database mein save hoga (next step mein banate hain)
+      console.log('Alert:', { name, blood, phone, camp: selectedCamp });
+
+      document.getElementById('successMsg').style.display = 'block';
+      setTimeout(closeModal, 2000);
+    }
+
+    // Location lo
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        pos => initMap(pos.coords.latitude, pos.coords.longitude),
+        err => {
+          // Default Delhi center
+          initMap(28.6139, 77.2090);
+          document.getElementById('camp-list').innerHTML =
+            '<p style="color:orange;padding:10px;">⚠️ Location nahi mili, Delhi center dikha raha hai</p>';
+        }
+      );
+    } else {
+      initMap(28.6139, 77.2090);
+    }
+  </script>
+
+</body>
+
+</html>

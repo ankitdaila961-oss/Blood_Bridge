@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Find Donor - Blood Bridge</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="container">
+      <div class="logo">🩸 Blood Bridge</div>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="register.html">Register</a></li>
+        <li><a href="find-donor.html">Find Donor</a></li>
+        <li><a href="requests.html">Requests</a></li>
+        <li><a href="blood-info.html">Blood Info</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="find-donor-section">
+    <div class="container">
+      <h2>Find Blood Donors</h2>
+      <div class="search-bar">
+        <select id="blood_group">
+          <option value="">All Blood Groups</option>
+          <option value="A+">A+</option>
+          <option value="A-">A-</option>
+          <option value="B+">B+</option>
+          <option value="B-">B-</option>
+          <option value="AB+">AB+</option>
+          <option value="AB-">AB-</option>
+          <option value="O+">O+</option>
+          <option value="O-">O-</option>
+        </select>
+        <input type="text" id="city" placeholder="Enter city">
+        <button id="searchBtn" class="btn btn-primary">Search</button>
+      </div>
+      <div id="loading" class="loading">Searching donors...</div>
+      <div id="results" class="results"></div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <p>Emergency Helpline: 104</p>
+      <p>&copy; 2024 Blood Bridge. All rights reserved. | Made by Ankit Daila</p>
+    </div>
+  </footer>
+
+  <script src="js/find-donor.js"></script>
+</body>
+</html>

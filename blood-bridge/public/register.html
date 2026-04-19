@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register as Donor - Blood Bridge</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+  <style>
+    /* Header Styling */
+    .register-section .form-card h2 { 
+      font-size: 3rem; 
+      margin-bottom: 3rem; 
+      text-align: center; 
+      letter-spacing: 1px;
+      color: var(--primary);
+    }
+
+    /* Form Card Padding */
+    .register-section .form-card { 
+      padding: 3rem !important; 
+    }
+
+    /* Form Group Spacing */
+    .form-section .form-group { 
+      margin-bottom: 2.5rem !important; 
+    }
+
+    /* Input Field Styling */
+    .form-section input, .form-section select { 
+      padding: 16px !important; 
+      font-size: 1.1rem !important; 
+      height: auto !important;
+    }
+
+    /* Register Section Padding */
+    .register-section { 
+      padding: 100px 0 !important; 
+    }
+
+    /* Grid Spacing */
+    .register-grid { 
+      margin-top: 3rem !important; 
+    }
+
+    /* Button Styling */
+    .form-section .btn { 
+      padding: 16px 32px !important; 
+      font-size: 1.1rem !important; 
+      font-weight: 600;
+      margin-top: 1.5rem;
+    }
+
+    /* OTP Section Styling */
+    #otpSection { 
+      padding: 2.5rem !important; 
+    }
+
+    #otpSection h3 { 
+      font-size: 1.8rem; 
+      margin-bottom: 2rem;
+    }
+
+    /* Step Indicator */
+    .step-indicator { 
+      margin-bottom: 3rem !important; 
+      gap: 1.5rem !important; 
+    }
+
+    .step { 
+      padding: 1.25rem !important; 
+      font-size: 1.05rem !important; 
+    }
+
+    /* ===== GLOBAL IMPROVEMENTS ===== */
+    * { transition: all 0.3s ease; }
+
+    /* Register Section Background */
+    .register-section { 
+      padding: 120px 0 !important;
+      background: linear-gradient(135deg, rgba(192, 57, 43, 0.08) 0%, rgba(231, 76, 60, 0.05) 100%);
+      min-height: calc(100vh - 100px);
+    }
+
+    /* Container Width */
+    .register-section .container {
+      max-width: 1400px;
+    }
+
+    /* Page Title */
+    .page-title {
+      font-size: 3.5rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 1rem;
+      letter-spacing: 1px;
+      background: linear-gradient(135deg, #c0392b, #e74c3c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ===== FORM CARD STYLING ===== */
+    .register-section .form-card { 
+      padding: 3rem !important;
+      background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+      border: none;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(192, 57, 43, 0.12);
+      backdrop-filter: blur(10px);
+    }
+
+    .card-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      text-align: center;
+      letter-spacing: 0.5px;
+      color: var(--primary);
+    }
+
+    /* ===== STEP INDICATOR ===== */
+    .step-indicator { 
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      margin: 3rem 0 4rem 0 !important;
+      gap: 2rem !important;
+    }
+
+    .step { 
+      padding: 1.8rem !important;
+      font-size: 1.1rem !important;
+      border-radius: 15px;
+      border: 2px solid transparent;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      background: linear-gradient(135deg, #f0f0f0, #e8e8e8);
+      color: var(--gray);
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+
+    .step.active { 
+      background: linear-gradient(135deg, var(--primary), #e74c3c);
+      color: white;
+      box-shadow: 0 8px 25px rgba(192, 57, 43, 0.25);
+      transform: translateY(-5px);
+    }
+
+    /* ===== TWO COLUMN LAYOUT ===== */
+    .two-column-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3.5rem !important;
+      align-items: start;
+    }
+
+    /* Verification & Registration Cards */
+    .verification-card,
+    .registration-card {
+      width: 100%;
+    }
+
+    /* ===== VERIFICATION CARD (LEFT) ===== */
+    .verification-card {
+      border: 3px solid var(--primary) !important;
+      background: linear-gradient(135deg, rgba(192, 57, 43, 0.05), rgba(231, 76, 60, 0.02)) !important;
+    }
+
+    .verification-card .card-title {
+      color: var(--primary);
+    }
+
+    /* OTP Inputs Container */
+    .otp-inputs-container {
+      display: flex;
+      gap: 0.8rem;
+      justify-content: center;
+      margin: 2.5rem 0;
+    }
+
+    /* OTP Input Fields */
+    .otp-input { 
+      width: 65px !important;
+      height: 65px !important;
+      font-size: 28px !important;
+      text-align: center !important;
+      border: 2px solid #ddd !important;
+      border-radius: 12px !important;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ffffff, #f8f9fa);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
+    }
+
+    .otp-input:focus { 
+      border-color: var(--primary) !important;
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(192, 57, 43, 0.15);
+      transform: scale(1.05);
+    }
+
+    .otp-input:not(:empty) {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    /* ===== REGISTRATION CARD (RIGHT) ===== */
+    .registration-card {
+      border: 2px solid #e0e0e0 !important;
+    }
+
+    /* ===== FORM STYLING ===== */
+    .form-section .form-group { 
+      margin-bottom: 2.8rem !important;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-section label {
+      font-weight: 700;
+      font-size: 1.05rem;
+      margin-bottom: 0.8rem;
+      color: var(--primary);
+      letter-spacing: 0.3px;
+    }
+
+    /* Input & Select Fields */
+    .form-section input, 
+    .form-section select { 
+      padding: 18px 16px !important;
+      font-size: 1.05rem !important;
+      height: auto !important;
+      border: 2px solid #e0e0e0 !important;
+      border-radius: 12px !important;
+      background: linear-gradient(135deg, #ffffff, #f8f9fa);
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .form-section input:focus, 
+    .form-section select:focus { 
+      border-color: var(--primary) !important;
+      box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.1) !important;
+      outline: none;
+      transform: translateY(-2px);
+    }
+
+    .form-section input::placeholder {
+      color: #bbb;
+      font-weight: 400;
+    }
+
+    /* Checkbox Styling */
+    .form-section .checkbox {
+      flex-direction: row;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .form-section input[type="checkbox"] {
+      width: 24px !important;
+      height: 24px !important;
+      cursor: pointer;
+      accent-color: var(--primary);
+    }
+
+    .form-section .checkbox label {
+      margin-bottom: 0 !important;
+      cursor: pointer;
+    }
+
+    /* ===== BUTTONS ===== */
+    .form-section .btn,
+    .verification-card .btn { 
+      padding: 16px 32px !important;
+      font-size: 1.1rem !important;
+      font-weight: 700;
+      border-radius: 12px;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      border: none;
+      width: 100%;
+    }
+
+    .btn-primary { 
+      background: linear-gradient(135deg, var(--primary), #e74c3c);
+      color: white;
+      box-shadow: 0 8px 20px rgba(192, 57, 43, 0.3);
+    }
+
+    .btn-primary:hover { 
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(192, 57, 43, 0.4);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #ffffff, #f8f9fa);
+      border: 2px solid var(--primary) !important;
+      color: var(--primary);
+    }
+
+    .btn-secondary:hover {
+      background: linear-gradient(135deg, var(--primary), #e74c3c);
+      color: white;
+      transform: translateY(-3px);
+    }
+
+    /* ===== MAP SECTION ===== */
+    .map-section { 
+      background: linear-gradient(135deg, #ffffff, #f8f9fa);
+      padding: 3rem !important;
+      border-radius: 20px;
+      border: 2px solid #e0e0e0 !important;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      margin-top: 3rem !important;
+    }
+
+    .map-section .card-title { 
+      font-size: 2.2rem;
+      margin-bottom: 2.5rem;
+    }
+
+    #map { 
+      height: 500px;
+      border-radius: 15px;
+      margin-top: 2rem;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      border: 2px solid #e0e0e0;
+    }
+
+    /* Camp Info Box */
+    .camp-info { 
+      background: linear-gradient(135deg, rgba(192, 57, 43, 0.08), rgba(231, 76, 60, 0.05));
+      padding: 2.5rem !important;
+      border-radius: 15px;
+      margin-top: 2.5rem !important;
+      border-left: 5px solid var(--primary);
+      box-shadow: 0 6px 20px rgba(192, 57, 43, 0.1);
+    }
+
+    .camp-info h4 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+    }
+
+    .camp-info p {
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: var(--gray);
+      font-weight: 500;
+    }
+
+    /* Complete Button */
+    #completeRegBtn {
+      background: linear-gradient(135deg, var(--primary), #e74c3c);
+      padding: 16px 32px !important;
+      font-size: 1.1rem !important;
+      font-weight: 700;
+      margin-top: 2.5rem !important;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(192, 57, 43, 0.3);
+      color: white;
+      width: 100%;
+    }
+
+    #completeRegBtn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(192, 57, 43, 0.4);
+    }
+
+    /* ===== MESSAGE STYLING ===== */
+    .message {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1.05rem;
+      text-align: center;
+      border-left: 5px solid transparent;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .message.success {
+      background: linear-gradient(135deg, #d4edda, #c3e6cb);
+      color: #155724;
+      border-left-color: #28a745;
+    }
+
+    .message.error {
+      background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+      color: #721c24;
+      border-left-color: #dc3545;
+    }
+
+    /* ===== RESPONSIVE DESIGN ===== */
+    @media (max-width: 1200px) {
+      .two-column-layout { gap: 2.5rem !important; }
+      .page-title { font-size: 2.8rem; }
+      .register-section .form-card { padding: 2.5rem !important; }
+      .card-title { font-size: 1.8rem; }
+      .otp-input { width: 55px !important; height: 55px !important; }
+    }
+
+    @media (max-width: 1024px) {
+      .two-column-layout { 
+        grid-template-columns: 1fr !important;
+        gap: 2rem !important;
+      }
+      
+      .step-indicator { 
+        grid-template-columns: 1fr;
+        gap: 1rem !important;
+        margin: 2rem 0 3rem 0 !important;
+      }
+
+      .page-title { font-size: 2.4rem; }
+      .register-section .form-card { padding: 2rem !important; }
+      .map-section { margin-top: 2rem !important; }
+    }
+
+    @media (max-width: 768px) {
+      .register-section { padding: 60px 0 !important; }
+      .register-section .form-card { padding: 1.5rem !important; border-radius: 15px; }
+      .page-title { font-size: 2rem; margin-bottom: 1.5rem; }
+      .card-title { font-size: 1.6rem; margin-bottom: 1.5rem; }
+      
+      .form-section .form-group { margin-bottom: 2rem !important; }
+      .form-section input, .form-section select { padding: 14px 12px !important; font-size: 1rem !important; }
+      .form-section .btn { padding: 14px 24px !important; font-size: 1rem !important; }
+      
+      .step { padding: 1rem !important; font-size: 0.95rem !important; }
+      
+      .otp-input { width: 50px !important; height: 50px !important; font-size: 22px !important; }
+      .otp-inputs-container { gap: 0.6rem; }
+      
+      #map { height: 350px; }
+      
+      .step-indicator { margin-bottom: 2rem !important; }
+    }
+
+    @media (max-width: 480px) {
+      .register-section { padding: 40px 0 !important; }
+      .register-section .form-card { padding: 1.2rem !important; }
+      .page-title { font-size: 1.6rem; }
+      .card-title { font-size: 1.3rem; }
+
+      .form-section .form-group { margin-bottom: 1.5rem !important; }
+      .form-section input, .form-section select { padding: 12px 10px !important; font-size: 0.95rem !important; }
+      .form-section .btn { padding: 12px 20px !important; font-size: 0.95rem !important; }
+
+      .step { padding: 0.8rem !important; font-size: 0.85rem !important; }
+      .step-indicator { gap: 0.8rem !important; }
+
+      .otp-input { width: 45px !important; height: 45px !important; font-size: 20px !important; }
+      .otp-inputs-container { gap: 0.5rem; }
+
+      #map { height: 250px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="container">
+      <div class="logo">🩸 Blood Bridge</div>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="register.html">Register</a></li>
+        <li><a href="find-donor.html">Find Donor</a></li>
+        <li><a href="requests.html">Requests</a></li>
+        <li><a href="blood-info.html">Blood Info</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="register-section">
+    <div class="container">
+      <h1 class="page-title">Register as Blood Donor</h1>
+
+      <!-- Step Indicator -->
+      <div class="step-indicator">
+        <div class="step active" id="step1">Step 1: Register</div>
+        <div class="step" id="step2">Step 2: Verify OTP</div>
+        <div class="step" id="step3">Step 3: Locate Camps</div>
+      </div>
+
+      <!-- Two-Column Layout: Verification Left, Form Right -->
+      <div class="two-column-layout">
+        <!-- Left: OTP Verification Card -->
+        <div class="verification-card form-card">
+          <h3 class="card-title">📱 OTP Verification</h3>
+          <div class="form-group">
+            <label style="display: block; text-align: center; margin-bottom: 1rem; color: var(--gray); font-size: 1rem;">
+              Enter OTP sent to: <strong id="phoneDisplay" style="display: block; margin-top: 0.8rem; color: var(--primary); font-size: 1.2rem;">Enter your phone in the form</strong>
+            </label>
+            <div class="otp-inputs-container">
+              <input type="text" class="otp-input" maxlength="1" data-otp="0">
+              <input type="text" class="otp-input" maxlength="1" data-otp="1">
+              <input type="text" class="otp-input" maxlength="1" data-otp="2">
+              <input type="text" class="otp-input" maxlength="1" data-otp="3">
+              <input type="text" class="otp-input" maxlength="1" data-otp="4">
+              <input type="text" class="otp-input" maxlength="1" data-otp="5">
+            </div>
+            <button type="button" class="btn btn-primary" id="verifyOtpBtn" style="width: 100%; margin-bottom: 1rem;">Verify OTP</button>
+            <button type="button" class="btn btn-secondary" id="resendOtpBtn" style="width: 100%;">Resend OTP</button>
+            <div id="otpMessage" class="message" style="margin-top: 1rem; display: none;"></div>
+          </div>
+        </div>
+
+        <!-- Right: Registration Form Card -->
+        <div class="registration-card form-card">
+          <h3 class="card-title">📋 Your Details</h3>
+          <form id="registerForm" class="form-section">
+            <div class="form-group">
+              <label for="name">Full Name *</label>
+              <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+              <label for="blood_group">Blood Group *</label>
+              <select id="blood_group" name="blood_group" required>
+                <option value="">Select Blood Group</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="city">City *</label>
+              <input type="text" id="city" name="city" value="Delhi" required>
+            </div>
+            <div class="form-group">
+              <label for="phone">Phone Number *</label>
+              <input type="tel" id="phone" name="phone" required placeholder="10-digit mobile number">
+            </div>
+            
+
+            <div class="form-group">
+              <label for="last_donation">Last Donation Date</label>
+              <input type="date" id="last_donation" name="last_donation">
+            </div>
+            <div class="form-group checkbox">
+              <input type="checkbox" id="available" name="available" checked>
+              <label for="available">Available to Donate</label>
+            </div>
+            <button type="button" id="registerBtn" class="btn btn-primary" style="width: 100%;">Register</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Map Section - Full Width Below -->
+      <div id="mapSection" class="map-section form-card" style="display: none; margin-top: 3rem;">
+        <h3 class="card-title">📍 Nearby Blood Camps in Your Area</h3>
+        <div id="map"></div>
+        <div class="camp-info">
+          <h4>Nearest Blood Camp:</h4>
+          <p id="nearestCamp">Locating nearest camp...</p>
+        </div>
+        <button type="button" class="btn btn-primary" id="completeRegBtn" style="margin-top: 1.5rem; width: 100%;">Complete Registration</button>
+      </div>
+
+      <div id="message" class="message"></div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <p>Emergency Helpline: 104</p>
+      <p>&copy; 2024 Blood Bridge. All rights reserved. | Made by Ankit Daila</p>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="js/register.js"></script>
+</body>
+</html>
